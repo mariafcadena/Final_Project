@@ -101,4 +101,4 @@ CreateDataBase <- function(Cartier, Property, Price, Area, Pieces, Chambres)
   return(DataBase)
 }
 
-data<-CreateDataBase(CARTIER2,PROPERTY2,PRICE2,AREA,PIECES,CHAMBRES)
+
