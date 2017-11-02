@@ -1,14 +1,21 @@
 #IDENTIFIES THE TYPE OF PROPERTY IN EACH ELEMENT OF THE VECTOR
+library(stringi)
+library(stringr)
+library(reshape2)
+
+FixProperty <- function(Property)
+{
+  a<-unlist(str_locate_all(pattern ='Appartement', Property)) 
+  if (length(a)>0){NewProperty<-'Appartement'} else { NewProperty<-'Maison' }
+  return(NewProperty)
+}
+
 CleanProperties <- function(Vector)
 {
-  NewVec<- Vector
-  for (i in 1:length(Vector))
-  {
-    a<-unlist(str_locate_all(pattern ='Appartement', Vector[i])) 
-    if (length(a)>0){NewVec[i]<-'Appartement'} else { NewVec[i]<-'Maison' }
-  }
+  NewVec<-lapply(Vector,FixProperty)
   return(NewVec)
 }
+PROPERTY2<-CleanProperties(PROPERTY)
 
 #IDENTIFIES THE NEIGHBOURHOOD OF PROPERTY IN EACH ELEMENT OF THE VECTOR
 CleanCartier <- function(Vector)
@@ -33,10 +40,10 @@ FixPrice <- function(Price)
 #CLEANS THE PRICE ON EVERY ITEM OF THE VECTOR
 CleanPrice <- function(Vector)
 {
-  NewVec<-lapply(Vector,FixedPrice)
+  NewVec<-lapply(Vector,FixPrice)
   return(NewVec)
 }
-
+PRICE2<-CleanPrice(PRICE)
 #FIXES THE VALUES OF ALL THE CHARACTERISTICS OF THE PROPERTY
 FixCaract <- function(Caract, Type)
 {
@@ -85,3 +92,13 @@ CleanArea <- function(Vector)
   NewVec<-lapply(Vector, FixCaract, Type="area")
   return(NewVec)
 }
+
+#CREATE THE DATAFRAME
+CreateDataBase <- function(Cartier, Property, Price, Area, Pieces, Chambres)
+{
+  DataBase <- do.call(rbind.data.frame, Map('c', Cartier,Property, Price, Area, Pieces, Chambres))
+  colnames(DataBase) <- c("CARTIER","PROPERTY", "PRICE","AREA", "PIECES", "CAHMBRES")
+  return(DataBase)
+}
+
+data<-CreateDataBase(CARTIER2,PROPERTY2,PRICE2,AREA,PIECES,CHAMBRES)
