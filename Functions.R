@@ -93,6 +93,17 @@ CleanArea <- function(Vector)
   return(NewVec)
 }
 
+GetPages <-function(WEB_PAGE)
+{
+  PRE_PAGES  <- WEB_PAGE %>% html_nodes(".u-500") %>% html_text()
+  PRE_PAGES2<-stri_trans_general(gsub("^\\s*<U\\+\\w+>|-", " ", PRE_PAGES[[1L]][1]),"Latin-ASCII")
+  if (length(PRE_PAGES2[[1L]])>1)
+  {PRE_PAGES3<-paste(PRE_PAGES2[[1L]][1],PRE_PAGES2[[1L]][2],sep="")}
+  else
+  {PRE_PAGES3<-PRE_PAGES2[[1L]][1]}
+  return(floor(as.numeric(PRE_PAGES3)/20))
+}
+
 #CREATE THE DATAFRAME
 CreateDataBase <- function(Cartier, Property, Price, Area, Pieces, Chambres)
 {
@@ -101,4 +112,33 @@ CreateDataBase <- function(Cartier, Property, Price, Area, Pieces, Chambres)
   return(DataBase)
 }
 
+ScrapsInfo <-function(link)
+{
+  WEB_PAGE <- read_html(link)
+  NO_PAGES <- GetPages(WEB_PAGE)
+  link<-paste(link,"&LISTING-LISTpg=",sep="")
+  for (i in 1:NO_PAGES)
+  {
+    test<-paste(link,i,sep="")
+    WEB_PAGE <- read_html(test)
+    PRE_CARTIER  <- WEB_PAGE %>% html_nodes(".c-pa-city") %>% html_text()
+    PRE_CARTIER  <- WEB_PAGE %>% html_nodes(".c-pa-city") %>% html_text()
+    PRE_PROPERTY <- WEB_PAGE %>% html_nodes(".c-pa-link") %>% html_text()
+    PRE_PRICE    <- WEB_PAGE %>% html_nodes(".c-pa-price") %>% html_text()
+    PRE_CARACT   <- WEB_PAGE %>% html_nodes(".c-pa-criterion") %>% html_text()
+    
+    CARTIER  <- CleanCartier(PRE_CARTIER)
+    PROPERTY <- CleanProperties(PRE_PROPERTY)
+    PRICE    <- CleanPrice(PRE_PRICE)
+    AREA     <- CleanArea(PRE_CARACT)
+    PIECES   <- CleanPiece(PRE_CARACT)
+    CHAMBRES <- CleanChambre(PRE_CARACT)
+    
+    data<-CreateDataBase(CARTIER2,PROPERTY2,PRICE2,AREA,PIECES,CHAMBRES)
+    
+    if (i==1){results<-data}
+    else {results<-rbind(results, data)}
+  }
+  return(results)
+}
 

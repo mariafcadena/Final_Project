@@ -2,32 +2,24 @@
 install.packages("rvest")
 library(rvest) 
 
-for (i in 1:3)
+#Create the matrix that gives the min and max of surface to create pages with less than 
+#2000 properties, limit to be able to scrapp information in Selonger.com
+
+m = matrix(c(5,10,20,30,40,50,60,70,80,100,150,200,9,19,29,39,49,59,69,79,99,149,199,400), nrow=12, ncol=2)
+links =NULL
+for (i in 1:12)
 {
-  test<-paste("http://www.seloger.com/list.htm?tri=initial&idtypebien=2,1&idtt=2&ci=750056&naturebien=1,2,4&LISTING-LISTpg=",i, sep="")
-  WEB_PAGE <- read_html(test)
-  PRE_CARTIER  <- WEB_PAGE %>% html_nodes(".c-pa-city") %>% html_text()
-  PRE_PROPERTY <- WEB_PAGE %>% html_nodes(".c-pa-link") %>% html_text()
-  PRE_PRICE    <- WEB_PAGE %>% html_nodes(".c-pa-price") %>% html_text()
-  PRE_CARACT   <- WEB_PAGE %>% html_nodes(".c-pa-criterion") %>% html_text()
-  
-  CARTIER  <- CleanCartier(PRE_CARTIER)
-  PROPERTY <- CleanProperties(PRE_PROPERTY)
-  PRICE    <- CleanPrice(PRE_PRICE)
-  AREA     <- CleanArea(PRE_CARACT)
-  PIECES   <- CleanPiece(PRE_CARACT)
-  CHAMBRES <- CleanChambre(PRE_CARACT)
-  
-  data<-CreateDataBase(CARTIER2,PROPERTY2,PRICE2,AREA,PIECES,CHAMBRES)
-  
-  if (i==1){results<-data}
-  else {results<-rbind(results, data)}
-  
+  p1 <-"http://www.seloger.com/list.htm?idtt=2&naturebien=1,2,4&idtypebien=1,2&ci=750056&tri=initial&"
+  p2 <- paste("surfacemin=",as.character(m[i,1]), sep="")
+  p3 <- paste("&surfacemax=",as.character(m[i,2]), sep="")
+  link=paste(paste(p1,p2, sep=""),p3, sep="")
+  links=append(links, link)
 }
 
-#ASI SE TIENEN LOS VECTORES DE CARACTERITICAS PARA LOS APARTAMENTOS EN LA LISTA DE UNA PAGINA
-WEB_PAGE <- read_html("http://www.seloger.com/list.htm?tri=initial&idtypebien=2,1&idtt=2&ci=750056&naturebien=1,2,4")
-PROPERTY <- WEB_PAGE %>% html_nodes(".c-pa-link") %>% html_text()
-CARTIER  <- WEB_PAGE %>% html_nodes(".c-pa-city") %>% html_text()
-PRICE    <- WEB_PAGE %>% html_nodes(".c-pa-price") %>% html_text()
-CARACT   <- WEB_PAGE %>% html_nodes(".c-pa-criterion") %>% html_text()
+#Loop through Areas
+for (i in range(links))
+{
+  Data <-ScrapsInfo(links[1])
+  if (i==1){ParisData<-data}
+  else {results<-rbind(ParisData, data)}
+}
