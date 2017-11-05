@@ -17,9 +17,22 @@ for (i in 1:12)
 }
 
 #Loop through Areas
-for (i in range(links))
+for (i in 1:12)
 {
-  Data <-ScrapsInfo(links[1])
-  if (i==1){ParisData<-data}
-  else {results<-rbind(ParisData, data)}
+  Data <-ScrapsInfo(links[i])
+  if (i==1){ParisData<-Data}
+  else {ParisData<-rbind(ParisData, Data)}
 }
+
+links[2]
+
+x_var <- rnorm( n = 15, mean = 5, sd = 2)
+y_var <- x_var + rnorm(n = 15, mean = 5, sd =4)
+size_var <- runif(15, 1,10)
+
+df.test_data <- data.frame(x_var, y_var, size_var)
+library(ggplot2)
+
+# PLOT THE DATA USING GGPLOT2
+ggplot(data=Data, aes(x=CARTIER, y=AREA_GROUP)) +
+  geom_point(aes(size=PRICE)) 

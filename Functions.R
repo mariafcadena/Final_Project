@@ -44,6 +44,7 @@ CleanPrice <- function(Vector)
   return(NewVec)
 }
 PRICE2<-CleanPrice(PRICE)
+
 #FIXES THE VALUES OF ALL THE CHARACTERISTICS OF THE PROPERTY
 FixCaract <- function(Caract, Type)
 {
@@ -93,6 +94,26 @@ CleanArea <- function(Vector)
   return(NewVec)
 }
 
+#CREATES THE GROUPS OF THE AREAS
+GroupsArea <- function(Area)
+{
+  m = matrix(c(5,20,40,80,100,150,200,20,40,80,100,150,200,401), nrow=7, ncol=2)
+  Grupo<-""
+  for (i in 1:7)
+  {
+    if (is.na(Area)==FALSE)
+    {if (m[i,1]<=Area && m[i,2]>Area){Grupo<-paste(as.character(m[i,1]),as.character(m[i,2]),sep=" - ")}}
+  }
+  return(Grupo)
+}
+
+GroupAreaVector <-function(Vector)
+{
+  NewVec<-lapply(Vector, GroupsArea)
+  return(NewVec)
+}
+
+#GETS THE NUMBER OF PAGES IN THE LINK OF SELONGER
 GetPages <-function(WEB_PAGE)
 {
   PRE_PAGES  <- WEB_PAGE %>% html_nodes(".u-500") %>% html_text()
@@ -105,10 +126,10 @@ GetPages <-function(WEB_PAGE)
 }
 
 #CREATE THE DATAFRAME
-CreateDataBase <- function(Cartier, Property, Price, Area, Pieces, Chambres)
+CreateDataBase <- function(Cartier, Property, Price, Area, Area_Group, Pieces, Chambres)
 {
-  DataBase <- do.call(rbind.data.frame, Map('c', Cartier,Property, Price, Area, Pieces, Chambres))
-  colnames(DataBase) <- c("CARTIER","PROPERTY", "PRICE","AREA", "PIECES", "CAHMBRES")
+  DataBase <- do.call(rbind.data.frame, Map('c', Cartier,Property, Price, Area, Area_Group, Pieces, Chambres))
+  colnames(DataBase) <- c("CARTIER","PROPERTY", "PRICE","AREA", "AREA_GROUP", "PIECES", "CHAMBRES")
   return(DataBase)
 }
 
@@ -127,18 +148,20 @@ ScrapsInfo <-function(link)
     PRE_PRICE    <- WEB_PAGE %>% html_nodes(".c-pa-price") %>% html_text()
     PRE_CARACT   <- WEB_PAGE %>% html_nodes(".c-pa-criterion") %>% html_text()
     
-    CARTIER  <- CleanCartier(PRE_CARTIER)
-    PROPERTY <- CleanProperties(PRE_PROPERTY)
-    PRICE    <- CleanPrice(PRE_PRICE)
-    AREA     <- CleanArea(PRE_CARACT)
-    PIECES   <- CleanPiece(PRE_CARACT)
-    CHAMBRES <- CleanChambre(PRE_CARACT)
+    CARTIER    <- CleanCartier(PRE_CARTIER)
+    PROPERTY   <- CleanProperties(PRE_PROPERTY)
+    PRICE      <- CleanPrice(PRE_PRICE)
+    AREA       <- CleanArea(PRE_CARACT)
+    AREA_GROUP <- GroupAreaVector(AREA)
+    PIECES     <- CleanPiece(PRE_CARACT)
+    CHAMBRES   <- CleanChambre(PRE_CARACT)
     
-    data<-CreateDataBase(CARTIER2,PROPERTY2,PRICE2,AREA,PIECES,CHAMBRES)
+    data<-CreateDataBase(CARTIER2,PROPERTY2,PRICE2,AREA,AREA_GROUP,PIECES,CHAMBRES)
     
     if (i==1){results<-data}
     else {results<-rbind(results, data)}
   }
   return(results)
 }
+
 
