@@ -114,8 +114,9 @@ GroupAreaVector <-function(Vector)
 }
 
 #GETS THE NUMBER OF PAGES IN THE LINK OF SELONGER
-GetPages <-function(WEB_PAGE)
+GetPages <-function(link)
 {
+  WEB_PAGE <-read_html(link)
   PRE_PAGES  <- WEB_PAGE %>% html_nodes(".u-500") %>% html_text()
   PRE_PAGES2<-stri_trans_general(gsub("^\\s*<U\\+\\w+>|-", " ", PRE_PAGES[[1L]][1]),"Latin-ASCII")
   if (length(PRE_PAGES2[[1L]])>1)

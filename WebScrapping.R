@@ -19,9 +19,10 @@ for (i in 1:12)
 #Loop through Areas
 for (i in 1:12)
 {
+  i<-3
   Data <-ScrapsInfo(links[i])
   if (i==1){ParisData<-Data}
-  else {ParisData<-rbind(ParisData, Data)}
+  else{ParisData<-rbind(ParisData, Data)}
 }
 
 links[2]
